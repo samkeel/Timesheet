@@ -1,0 +1,60 @@
+A few sample queries
+
+daily-self-join-sum-withoutLunch
+
+SELECT
+company.name as Employer,
+subCompany.companyName as "Sub Company",
+n.day,
+n.date,
+Sum(o.timeTaken) AS "daily total"
+FROM
+tasks AS n
+LEFT JOIN tasks AS o ON (o.tsID = n.tsID)
+INNER JOIN Main ON Main.date = n.tsID AND Main.date = o.tsID
+INNER JOIN company ON Main.companyID = company.companyID
+INNER JOIN subCompany ON company.subcontracting = subCompany.subID
+WHERE n.taskDescription != "Lunch" AND
+n.date BETWEEN "07/01/2016" AND "07/30/2016"
+group by n.date
+order by n.date
+
+Between Dates
+
+SELECT
+company.name AS Employer,
+subCompany.companyName AS "Sub Company",
+tasks.date,
+tasks.day,
+tasks.taskStart,
+tasks.taskEnd,
+tasks.timeTaken,
+tasks.taskDescription
+FROM
+Main
+INNER JOIN company ON Main.companyID = company.companyID
+INNER JOIN subCompany ON company.subcontracting = subCompany.subID
+INNER JOIN tasks ON Main.date = tasks.tsID
+WHERE
+tasks.date BETWEEN "07/25/2016" AND "07/30/2016"
+order by tasks.date
+
+Daily self join Sum
+
+SELECT
+n.day,
+n.date,
+sum(o.timeTaken) as "daily total (inc lunch)"
+from tasks n LEFT JOIN tasks o
+on (o.tsID = n.tsID)
+WHERE n.date BETWEEN "07/25/2016" AND "07/30/2016"
+group by n.date
+order by n.date
+
+Total Hours
+
+SELECT
+sum(o.timeTaken) as "Running hourly total (inc lunch)"
+from tasks n LEFT JOIN tasks o
+on (o.tsID = n.tsID)
+WHERE n.date BETWEEN "07/01/2016" AND "07/30/2016"
